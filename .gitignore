@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+
+# OS / misc
+.DS_Store
+Thumbs.db
+
+# Optional lockfiles (uncomment to ignore if you only want one)
+# yarn.lock
+# pnpm-lock.yaml
+# package-lock.json
+
+# Generated types (if any custom codegen dirs later)
+**/generated/
+
+# Temporary
+.tmp/
+.temp/
