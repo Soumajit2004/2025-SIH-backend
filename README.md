@@ -9,42 +9,80 @@ Basic TypeScript + Express server scaffold.
 - `npm start` – Run compiled JavaScript from `dist`.
 - `npm run clean` – Remove `dist` folder.
 
-## Getting Started
+# SIH Backend (FastAPI)
+
+Converted from an initial Node/Express scaffold to a Python FastAPI application using `uv` for dependency management and fast installs.
+
+## Features
+
+- FastAPI app with root (`/`) and health (`/health`) endpoints
+- Environment variable loading via `python-dotenv`
+- Global exception handler scaffold
+- Example `.env.example`
+
+## Requirements
+
+- Python 3.10+
+- (Recommended) Install `uv`: https://github.com/astral-sh/uv
+
+## Setup (with uv)
 
 ```bash
-npm install
-npm run dev
+uv sync
+uv run fastapi dev app/main.py  # (Future uv fastapi plugin) OR use uvicorn directly
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
-Visit: http://localhost:3000/
+If not using uv:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install fastapi uvicorn[standard] python-dotenv
+uvicorn app.main:app --reload --port 8000
+```
+
+Visit: http://127.0.0.1:8000/
+
+Interactive docs:
+
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
 ## Environment Variables
 
-Create a `.env` file if needed:
+Create a `.env` file (copy from `.env.example`):
 
 ```
-PORT=4000
-```
-
-## Production Build
-
-```bash
-npm run build
-npm start
+PORT=8000
 ```
 
 ## Project Structure
 
 ```
-src/
-  index.ts        # Express app entry
+app/
+  main.py          # FastAPI entrypoint
+pyproject.toml
+.env.example
 ```
 
-Generated `dist/` contains compiled JS after build.
+## Testing (planned)
 
-## Next Steps
+After tests are added:
 
-- Add routes/controllers
-- Add logging (e.g. morgan / pino)
-- Add error handling middleware
-- Add tests (Jest / Vitest)
+```bash
+uv run pytest
+```
+
+## Next Steps / Suggestions
+
+- Add routers (`app/api/routers/*.py`)
+- Pydantic models & response schemas
+- Configure logging
+- Add database layer (SQLModel / SQLAlchemy / Prisma Client Python)
+- Add CI (GitHub Actions)
+- Implement tests (pytest + httpx)
+
+## License
+
+MIT
