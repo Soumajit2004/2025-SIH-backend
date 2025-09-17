@@ -1,0 +1,28 @@
+[project]
+name = "sih-backend"
+version = "0.1.0"
+description = "FastAPI backend converted from initial Node/Express scaffold"
+readme = "README.md"
+authors = [{ name = "", email = "" }]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "python-dotenv"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "httpx",
+  "pytest-asyncio"
+]
+
+[tool.uv]
+# If using uv (https://github.com/astral-sh/uv)
+package = true
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -1,52 +1,67 @@
-# Dependencies
-node_modules/
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
 
-# Build outputs
-dist/
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Distribution / build
 build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
 
-# TypeScript incremental build info
-*.tsbuildinfo
+# Unit test / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
 
 # Logs
 logs/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
-# Runtime data
-pids/
-*.pid
-*.seed
-
-# Coverage
-coverage/
-.nyc_output/
-
-# Env files
+# Environment files
 .env
 .env.local
 .env.*.local
+.envrc
 
-# IDE/editor
+# IDE / editor
 .vscode/
 .idea/
 *.swp
+*.swo
 
 # OS / misc
 .DS_Store
 Thumbs.db
 
-# Optional lockfiles (uncomment to ignore if you only want one)
-# yarn.lock
-# pnpm-lock.yaml
-# package-lock.json
-
-# Generated types (if any custom codegen dirs later)
-**/generated/
+# Caches
+.mypy_cache/
+.ruff_cache/
+.cache/
 
 # Temporary
+tmp/
 .tmp/
 .temp/
+
+# Generated
+**/generated/
+
+# Node leftovers (in case of partial removal)
+node_modules/
+package-lock.json
