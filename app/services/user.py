@@ -15,7 +15,8 @@ def get_or_create_user(uid: str, email: Optional[str]) -> Dict[str, Any]:
     if snap.exists:
         data = snap.to_dict() or {}
     else:
-        data = {"email": email, "createdOn": server_timestamp()}
+        # New user defaults: regular user (not admin)
+        data = {"email": email, "type": "user", "createdOn": server_timestamp()}
         ref.set(data)
     data["id"] = uid
     return data

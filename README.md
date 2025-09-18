@@ -57,6 +57,21 @@ Create a `.env` file (copy from `.env.example`):
 PORT=8000
 ```
 
+Additional (Firebase credentials – one of the following is required only if you call endpoints hitting Firestore/auth):
+
+```
+# Highest priority if set and file exists
+FIREBASE_CREDENTIALS=/run/secrets/firebase-service-account.json
+
+# Or base64 encoded service account json
+FIREBASE_CREDENTIALS_B64=ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsIC4uLn0=
+
+# Or raw json string
+FIREBASE_CREDENTIALS_JSON={"type": "service_account", ...}
+```
+
+Validation is handled through Pydantic settings (`app/core/config.py`). Missing Firebase credentials do not block application startup; the first Firebase operation will raise if still missing.
+
 ## Project Structure
 
 ```
@@ -156,3 +171,33 @@ pytest -q
 ## License
 
 MIT
+
+## Docker
+
+Build image:
+
+```bash
+docker build -t sih-backend .
+```
+
+Run (mapping local port 8000):
+
+```bash
+docker run --rm -p 8000:8000 \
+  -e PORT=8000 \
+  -e FIREBASE_CREDENTIALS_B64="$(base64 -w0 serviceAccount.json)" \
+  sih-backend
+```
+
+If you prefer mounting a credentials file:
+
+```bash
+docker run --rm -p 8000:8000 \
+  -e FIREBASE_CREDENTIALS=/creds/serviceAccount.json \
+  -v $(pwd)/serviceAccount.json:/creds/serviceAccount.json:ro \
+  sih-backend
+```
+
+Visit http://127.0.0.1:8000/docs
+
+The container uses a non-root user (`appuser`) and installs dependencies with `uv` for faster, deterministic builds.

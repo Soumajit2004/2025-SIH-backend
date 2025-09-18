@@ -38,3 +38,9 @@ async def get_current_user(creds: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=401, detail="Token missing uid")
 
     return get_or_create_user(uid=uid, email=email)
+
+
+async def admin_required(user=Depends(get_current_user)):
+    if user.get("type") != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return user

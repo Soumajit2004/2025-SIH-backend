@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # still allow .env reading for local dev
 
-load_dotenv()
+load_dotenv()  # ensure early for pydantic BaseSettings env_file override order
+
+from app.core.config import settings
 
 from app.routers.booking import router as booking_router
 
@@ -22,7 +23,8 @@ async def health():
 # Optional: startup event
 @app.on_event("startup")
 async def startup():
-    port = os.getenv("PORT", "8000")
+    # Access settings to ensure they load & possibly log; placeholder
+    _ = settings.PORT
     # Could initialize DB connections etc.
 
 # Custom exception handler example placeholder

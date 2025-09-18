@@ -22,6 +22,8 @@ from typing import Any
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 
+from app.core.config import settings
+
 
 def _load_credentials() -> credentials.Base:
 	"""Load service account credentials from env variables.
@@ -32,16 +34,17 @@ def _load_credentials() -> credentials.Base:
 	3. FIREBASE_CREDENTIALS_JSON (raw json string)
 	Raises RuntimeError if none available.
 	"""
-	path = os.getenv("FIREBASE_CREDENTIALS")
+	# Use settings (which already validated file existence if provided)
+	path = settings.FIREBASE_CREDENTIALS
 	if path and os.path.isfile(path):
 		return credentials.Certificate(path)
 
-	b64_content = os.getenv("FIREBASE_CREDENTIALS_B64")
+	b64_content = settings.FIREBASE_CREDENTIALS_B64
 	if b64_content:
 		data = json.loads(base64.b64decode(b64_content).decode("utf-8"))
 		return credentials.Certificate(data)
 
-	raw_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+	raw_json = settings.FIREBASE_CREDENTIALS_JSON
 	if raw_json:
 		data = json.loads(raw_json)
 		return credentials.Certificate(data)
