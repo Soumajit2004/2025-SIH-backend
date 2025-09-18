@@ -8,10 +8,10 @@ license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
   "fastapi[standard]",
-  "uvicorn[standard]",
   "python-dotenv",
   "firebase-admin",
   "pydantic-settings",
+  "hypercorn",
 ]
 
 [project.optional-dependencies]
