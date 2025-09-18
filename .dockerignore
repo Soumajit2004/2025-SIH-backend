@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info
+.eggs
+
+# Virtual envs
+.venv
+venv
+.env
+
+# Git
+.git
+.gitignore
+
+# Local env files & credentials (provide explicitly instead)
+.env
+*.env
+serviceAccount.json
+
+# Caches
+.cache
+.mypy_cache
+.pytest_cache
+
+# IDE/editor
+.vscode
+.idea
+.DS_Store
+
+# Node leftovers (from original scaffold)
+node_modules
+npm-debug.log*
+yarn.lock
+package-lock.json
+
+# Docker
+Dockerfile*
