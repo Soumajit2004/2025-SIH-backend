@@ -3,13 +3,14 @@ name = "sih-backend"
 version = "0.1.0"
 description = "FastAPI backend converted from initial Node/Express scaffold"
 readme = "README.md"
-authors = [{ name = "", email = "" }]
+authors = [{ name = "SIH Dev Team", email = "dev-team@example.com" }]
 license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
-  "fastapi",
+  "fastapi[standard]",
   "uvicorn[standard]",
-  "python-dotenv"
+  "python-dotenv",
+  "firebase-admin",
 ]
 
 [project.optional-dependencies]

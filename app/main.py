@@ -5,7 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from app.routers.booking import router as booking_router
+
 app = FastAPI(title="SIH Backend", version="0.1.0")
+
+app.include_router(booking_router)
 
 @app.get("/")
 async def root():

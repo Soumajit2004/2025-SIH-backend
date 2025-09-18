@@ -66,22 +66,92 @@ pyproject.toml
 .env.example
 ```
 
-## Testing (planned)
+## Booking API
 
-After tests are added:
+Minimal CRUD (no update) backed by Firestore.
+
+All endpoints require `Authorization: Bearer <Firebase ID token>`.
+
+Prefix: `/bookings`
+
+### Create
+
+POST `/bookings/`
+Body:
+
+```json
+{
+  "hospitalityID": "abc123",
+  "startDate": "2025-09-18T10:00:00Z",
+  "endDate": "2025-09-19T10:00:00Z",
+  "ticketCount": 1
+}
+```
+
+### List
+
+GET `/bookings/` -> list for user
+
+### Get
+
+GET `/bookings/{id}` -> single booking
+
+### Delete
+
+DELETE `/bookings/{id}` -> 204
+
+Firestore `bookings` document shape:
+
+```
+{
+  hospitalityID: string,
+  startDate: timestamp,
+  endDate: timestamp,
+  user: string (uid),
+  ticketCount: number,
+  createdOn: timestamp
+}
+```
+
+Firestore `users` document shape:
+
+```
+{
+  email: string,
+  createdOn: timestamp
+}
+```
+
+## Firebase Admin Credentials
+
+Provide one of:
+
+- `FIREBASE_CREDENTIALS` = path to service account JSON
+- `FIREBASE_CREDENTIALS_B64` = base64 of JSON
+- `FIREBASE_CREDENTIALS_JSON` = raw JSON string
+
+Example:
 
 ```bash
-uv run pytest
+export FIREBASE_CREDENTIALS_B64=$(base64 -w0 serviceAccount.json)
+```
+
+## Tests
+
+Install dev extras then run:
+
+```bash
+pip install -e .[dev]
+pytest -q
 ```
 
 ## Next Steps / Suggestions
 
-- Add routers (`app/api/routers/*.py`)
-- Pydantic models & response schemas
-- Configure logging
-- Add database layer (SQLModel / SQLAlchemy / Prisma Client Python)
+- Add pagination for bookings
+- Add update (PATCH) booking
+- Implement logging
 - Add CI (GitHub Actions)
-- Implement tests (pytest + httpx)
+- Add test coverage for auth & bookings (mock Firebase)
 
 ## License
 
