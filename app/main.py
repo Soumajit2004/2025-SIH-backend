@@ -7,10 +7,12 @@ load_dotenv()  # ensure early for pydantic BaseSettings env_file override order
 from app.core.config import settings
 
 from app.routers.booking import router as booking_router
+from app.routers.hospitality import router as hospitality_router
 
 app = FastAPI(title="SIH Backend", version="0.1.0")
 
 app.include_router(booking_router)
+app.include_router(hospitality_router)
 
 @app.get("/")
 async def root():
