@@ -52,6 +52,20 @@ class Settings(BaseSettings):
         default=None, description="Firebase Storage bucket name (e.g. your-project.appspot.com)"
     )
 
+    # Development auth overrides
+    DEV_USE_DUMMY_USER: bool = Field(
+        default=False,
+        description="If true, authentication will return a dummy user without verifying Firebase tokens (DEV ONLY)."
+    )
+    DEV_DUMMY_USER_UID: str = Field(
+        default="dev-user",
+        description="UID for the dummy development user when DEV_USE_DUMMY_USER is true."
+    )
+    DEV_DUMMY_USER_EMAIL: Optional[str] = Field(
+        default="dev@example.com",
+        description="Email for the dummy development user when DEV_USE_DUMMY_USER is true."
+    )
+
     model_config = {
         "env_file": ".env",
         "case_sensitive": False,
