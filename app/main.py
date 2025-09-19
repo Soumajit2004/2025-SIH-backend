@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv  # still allow .env reading for local dev
 
@@ -11,6 +12,16 @@ from app.routers.hospitality import router as hospitality_router
 from app.routers.chatbot import router as chatbot_router  # added import
 
 app = FastAPI(title="SIH Backend", version="0.1.0")
+
+# CORS: allow any localhost / 127.0.0.1 / 0.0.0.0 origin & typical dev ports
+# Using allow_origin_regex to avoid enumerating every port.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 app.include_router(booking_router)
 app.include_router(hospitality_router)
