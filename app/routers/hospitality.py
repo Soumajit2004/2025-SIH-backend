@@ -48,12 +48,12 @@ async def create_hospitality(payload: HospitalityCreate):
 
 
 @router.get("/", response_model=List[HospitalityOut])
-async def list_hospitality(user=Depends(get_current_user)):
+async def list_hospitality():
     return service.list_hospitality()
 
 
 @router.get("/{hid}", response_model=HospitalityOut)
-async def get_hospitality(hid: str, user=Depends(get_current_user)):
+async def get_hospitality(hid: str):
     data = service.get_hospitality(hid)
     if not data:
         raise HTTPException(status_code=404, detail="Not found")

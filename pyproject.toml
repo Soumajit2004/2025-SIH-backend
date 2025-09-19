@@ -12,6 +12,7 @@ dependencies = [
   "firebase-admin",
   "pydantic-settings",
   "hypercorn",
+  "google-generativeai",
 ]
 
 [project.optional-dependencies]

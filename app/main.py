@@ -8,11 +8,13 @@ from app.core.config import settings
 
 from app.routers.booking import router as booking_router
 from app.routers.hospitality import router as hospitality_router
+from app.routers.chatbot import router as chatbot_router  # added import
 
 app = FastAPI(title="SIH Backend", version="0.1.0")
 
 app.include_router(booking_router)
 app.include_router(hospitality_router)
+app.include_router(chatbot_router)  # include chatbot routes
 
 @app.get("/")
 async def root():

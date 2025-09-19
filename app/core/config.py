@@ -39,6 +39,14 @@ class Settings(BaseSettings):
         default=None, description="Raw JSON string for service account"
     )
 
+    # Google Generative AI
+    GOOGLE_API_KEY: Optional[str] = Field(
+        default=None, description="API key for Google Generative AI (Gemini)"
+    )
+    GEMINI_MODEL: str = Field(
+        default="gemini-pro", description="Gemini model name to use for chatbot"
+    )
+
     model_config = {
         "env_file": ".env",
         "case_sensitive": False,
