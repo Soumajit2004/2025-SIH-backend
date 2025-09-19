@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import firebase_admin
-from firebase_admin import credentials, firestore, auth
+from firebase_admin import credentials, firestore, auth, storage
 
 from app.core.config import settings
 
@@ -69,6 +69,57 @@ def get_firestore():
 def get_auth():  # return module for simplicity
 	_init_app()
 	return auth
+
+
+def get_storage_bucket():
+	"""Return default storage bucket. Requires FIREBASE_STORAGE_BUCKET setting.
+
+	The bucket must be specified in settings. We create (initialize) the app with
+	default bucket if provided or lazily call storage.bucket(name) otherwise.
+	"""
+	_init_app()
+	bucket_name = settings.FIREBASE_STORAGE_BUCKET
+	if bucket_name:
+		return storage.bucket(bucket_name)
+	# fallback to default bucket configured inside credentials (may be None)
+	return storage.bucket()
+
+
+from typing import Optional
+
+
+def upload_bytes(path: str, data: bytes, content_type: Optional[str] = None, make_public: bool = True) -> str:
+	"""Upload raw bytes to storage under path and return the public URL.
+
+	If make_public is True, the blob will be made publicly readable.
+	"""
+	bucket = get_storage_bucket()
+	blob = bucket.blob(path)
+	if content_type is not None:
+		blob.upload_from_string(data, content_type=content_type)
+	else:
+		blob.upload_from_string(data)
+	if make_public:
+		try:
+			blob.make_public()
+		except Exception:
+			# Ignore inability to make public; caller can still build signed URL if needed.
+			pass
+	return blob.public_url or f"gs://{bucket.name}/{path}"
+
+
+def delete_prefix(prefix: str) -> int:
+	"""Delete all blobs with given prefix. Returns number deleted."""
+	bucket = get_storage_bucket()
+	blobs = bucket.list_blobs(prefix=prefix)
+	count = 0
+	for b in blobs:
+		try:
+			b.delete()
+			count += 1
+		except Exception:
+			pass
+	return count
 
 
 def server_timestamp() -> datetime:
