@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from enum import Enum
 from typing import List, Optional
@@ -21,16 +21,24 @@ class HospitalityBase(BaseModel):
     type: HospitalityType
     name: str = Field(..., min_length=1, max_length=200)
     description: str = Field(..., min_length=1, max_length=2000)
+    location: Optional[dict] = None  # {lat, lng}
+    images: Optional[List[dict]] = None  # list of {url, path, original, contentType}
 
 
-class HospitalityCreate(HospitalityBase):
-    pass
+class HospitalityCreate(BaseModel):
+    type: HospitalityType
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(..., min_length=1, max_length=2000)
+    latitude: float
+    longitude: float
 
 
 class HospitalityUpdate(BaseModel):
     type: Optional[HospitalityType] = None
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = Field(None, min_length=1, max_length=2000)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
     def dict(self, *args, **kwargs):  # keep only provided keys
         data = super().dict(*args, **kwargs)
@@ -42,8 +50,30 @@ class HospitalityOut(HospitalityBase):
 
 
 @router.post("/", response_model=HospitalityOut, status_code=201, dependencies=[Depends(admin_required)])
-async def create_hospitality(payload: HospitalityCreate):
-    data = service.create_hospitality(htype=payload.type.value, name=payload.name, description=payload.description)
+async def create_hospitality(
+    type: HospitalityType = Form(...),
+    name: str = Form(..., min_length=1, max_length=200),
+    description: str = Form(..., min_length=1, max_length=2000),
+    latitude: float = Form(...),
+    longitude: float = Form(...),
+    images: List[UploadFile] = File(default_factory=list),
+):
+    # Read files into memory (could optimize with streaming if large)
+    image_payload = []
+    for f in images:
+        try:
+            content = await f.read()
+        finally:
+            await f.close()
+        image_payload.append((f.filename, content, f.content_type))
+    data = service.create_hospitality(
+        htype=type.value,
+        name=name,
+        description=description,
+        latitude=latitude,
+        longitude=longitude,
+        images=image_payload,
+    )
     return data
 
 
@@ -61,15 +91,32 @@ async def get_hospitality(hid: str):
 
 
 @router.patch("/{hid}", response_model=HospitalityOut, dependencies=[Depends(admin_required)])
-async def update_hospitality(hid: str, payload: HospitalityUpdate):
-    updates = payload.dict()
-    type_obj = updates.get("type")
-    htype = type_obj.value if type_obj is not None else None
+async def update_hospitality(
+    hid: str,
+    type: Optional[HospitalityType] = Form(None),
+    name: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    latitude: Optional[float] = Form(None),
+    longitude: Optional[float] = Form(None),
+    new_images: List[UploadFile] = File(default_factory=list),
+    replace_images: bool = Form(False),
+):
+    image_payload = []
+    for f in new_images:
+        try:
+            content = await f.read()
+        finally:
+            await f.close()
+        image_payload.append((f.filename, content, f.content_type))
     data = service.update_hospitality(
         hid,
-        name=updates.get("name"),
-        description=updates.get("description"),
-        htype=htype,
+        name=name,
+        description=description,
+        htype=type.value if type else None,
+        latitude=latitude,
+        longitude=longitude,
+        new_images=image_payload if image_payload else None,
+        replace_images=replace_images,
     )
     if not data:
         raise HTTPException(status_code=404, detail="Not found")

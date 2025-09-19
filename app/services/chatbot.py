@@ -155,9 +155,8 @@ def _generate_reply(history: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def _public_history(history: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    # The spec only mentioned system|user but we include assistant. If strict filtering desired:
-    # return [h for h in history if h["type"] in ("system", "user")] # comment out to hide assistant
-    return history
+    # Exclude system prompt from outward facing history
+    return [h for h in history if h["type"] != "system"]
 
 __all__ = [
     "create_session",

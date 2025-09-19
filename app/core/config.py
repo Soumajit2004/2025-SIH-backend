@@ -44,7 +44,12 @@ class Settings(BaseSettings):
         default=None, description="API key for Google Generative AI (Gemini)"
     )
     GEMINI_MODEL: str = Field(
-        default="gemini-pro", description="Gemini model name to use for chatbot"
+        default="gemini-2.5-flash", description="Gemini model name to use for chatbot"
+    )
+
+    # Firebase Storage
+    FIREBASE_STORAGE_BUCKET: Optional[str] = Field(
+        default=None, description="Firebase Storage bucket name (e.g. your-project.appspot.com)"
     )
 
     model_config = {

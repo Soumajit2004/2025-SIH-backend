@@ -201,3 +201,76 @@ docker run --rm -p 8000:8000 \
 Visit http://127.0.0.1:8000/docs
 
 The container uses a non-root user (`appuser`) and installs dependencies with `uv` for faster, deterministic builds.
+
+## Hospitality API (Images & Location)
+
+Endpoints under `/hospitality` now support geo-location and image uploads.
+
+### Create Hospitality (multipart/form-data)
+
+POST `/hospitality/`
+
+Form fields:
+
+```
+type=attraction|hotel|restaurant
+name=<string>
+description=<string>
+latitude=<float>
+longitude=<float>
+images=<one or more image files>  # optional repeated field
+```
+
+Returns JSON including `location` and `images` array:
+
+```json
+{
+  "id": "abc123",
+  "type": "hotel",
+  "name": "Sample Hotel",
+  "description": "Great place",
+  "location": { "lat": 12.34, "lng": 56.78 },
+  "images": [
+    {
+      "url": "https://storage.googleapis.com/<bucket>/hospitality/abc123/hero-<rand>.jpg",
+      "path": "hospitality/abc123/hero-<rand>.jpg",
+      "original": "hero.jpg",
+      "contentType": "image/jpeg"
+    }
+  ]
+}
+```
+
+### Update Hospitality
+
+PATCH `/hospitality/{id}` (multipart/form-data). All fields optional:
+
+```
+type (optional)
+name (optional)
+description (optional)
+latitude (optional)
+longitude (optional)
+new_images=<image files> (optional)
+replace_images=true|false (optional; default false)
+```
+
+If `replace_images=true`, previously stored images metadata is replaced (but physical old images are NOT yet individually deleted; a future improvement could remove paths no longer referenced). Currently full deletion happens only on delete endpoint.
+
+### Delete Hospitality
+
+DELETE `/hospitality/{id}` also deletes all stored images under `hospitality/{id}/` prefix in Firebase Storage.
+
+### Storage Structure
+
+Images are stored in Firebase Storage bucket configured via `FIREBASE_STORAGE_BUCKET` under:
+
+```
+hospitality/<hospitalityId>/<sanitizedName>-<random>.ext
+```
+
+Files are made public (best for demo). For production consider signed URLs and access rules.
+
+### Environment Variable
+
+Set `FIREBASE_STORAGE_BUCKET=<your-project>.appspot.com` to enable image uploads.
