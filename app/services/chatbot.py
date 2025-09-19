@@ -32,6 +32,7 @@ System Prompt:
 
 import os
 import uuid
+from functools import lru_cache
 from typing import Dict, Any, List
 
 from app.utils.firebase import get_firestore, server_timestamp, to_firestore_timestamp
@@ -39,8 +40,29 @@ from app.core.config import settings
 
 import google.generativeai as genai  # type: ignore
 
-# Placeholder system prompt (EDIT THIS as needed)
-SYSTEM_PROMPT = "You are a helpful tourism assistant. Provide concise, factual answers."
+# Load system prompt from external text file so it can be edited without code changes.
+_SYSTEM_PROMPT_FALLBACK = "You are a helpful tourism assistant. Provide concise, factual answers."
+_SYSTEM_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "system_prompt.txt")
+
+
+@lru_cache(maxsize=1)
+def _load_system_prompt() -> str:
+    """Return the system prompt loaded from `system_prompt.txt`.
+
+    Fallback to default string if file missing or unreadable. Cached to avoid
+    repeated disk I/O per process lifecycle. In tests, cache can be cleared via
+    _load_system_prompt.cache_clear().
+    """
+    try:
+        with open(_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            return content or _SYSTEM_PROMPT_FALLBACK
+    except Exception:
+        return _SYSTEM_PROMPT_FALLBACK
+
+
+def get_system_prompt() -> str:
+    return _load_system_prompt()
 
 COLLECTION = "chatbot_sessions"
 
@@ -81,8 +103,9 @@ def create_session(initial_user_message: str) -> Dict[str, Any]:
     db = _firestore()
     sid = str(uuid.uuid4())
     now = _now_ts()
+    system_prompt = get_system_prompt()
     history: List[Dict[str, Any]] = [
-        {"type": "system", "message": SYSTEM_PROMPT, "timestamp": now},
+        {"type": "system", "message": system_prompt, "timestamp": now},
         {"type": "user", "message": initial_user_message, "timestamp": now},
     ]
 
@@ -126,13 +149,13 @@ def append_message(session_id: str, user_message: str) -> Dict[str, Any]:
 
 def _generate_reply(history: List[Dict[str, Any]]) -> Dict[str, Any]:
     # Build a single prompt concatenating system + conversation (simple approach)
-    system_prompt = SYSTEM_PROMPT
+    system_prompt = get_system_prompt()
     convo_lines: List[str] = []
     for item in history:
         if item["type"] == "system":
             # take first system prompt only
-            if system_prompt == SYSTEM_PROMPT:  # default unchanged
-                system_prompt = item["message"] or SYSTEM_PROMPT
+            if system_prompt == get_system_prompt():  # default unchanged
+                system_prompt = item["message"] or get_system_prompt()
         elif item["type"] == "user":
             convo_lines.append(f"User: {item['message']}")
         elif item["type"] == "assistant":
@@ -161,5 +184,5 @@ def _public_history(history: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 __all__ = [
     "create_session",
     "append_message",
-    "SYSTEM_PROMPT",
+    "get_system_prompt",
 ]
